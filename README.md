@@ -1,9 +1,56 @@
-Plaeae run this command to install some packge
+# MC AI 聊天机器人
 
-```bash
-pip install mcrcon openai
+基于 Minecraft 日志监控与 RCON 指令执行的 AI 自动对话机器人
+
+## 项目简介
+通过读取服务器日志识别玩家消息，调用 AI 接口生成回复，并通过 RCON 将结果发送至游戏内聊天框。
+支持上下文记忆与自动长度控制。
+
+## 环境依赖
+Python 3.8 及以上版本
+
+安装依赖库：
+
+```
+pip install openai
 ```
 
-Then to edit atri.py!
+## 配置项说明
+- LOG_PATH：服务器 latest.log 文件路径
+- API_KEY：对话模型接口密钥
+- HOST：服务器地址
+- PASSWD：RCON 密码
+- BASE_URL：API 请求地址
 
-run!
+## 使用方法
+1. 正确配置各项参数
+2. 确保服务器开启 RCON 功能
+3. 运行主程序
+4. 在游戏内使用 >>> 结尾发送消息，即可触发 AI 回复
+
+## 指令格式
+玩家消息格式：
+
+```text
+内容>>>
+```
+如：
+
+```text
+<Fovlin> 你好亚托莉！>>>
+```
+
+机器人将自动识别并进行回复。
+
+## 文件说明
+- chat.json：存储历史对话上下文
+- 主程序：日志读取、RCON 通信、AI 请求处理
+
+## 注意事项
+1. 确保日志路径配置正确，否则无法读取消息
+2. 长时间运行可能因网络或服务器问题导致 RCON 断开
+3. AI 回复内容中的双引号可能导致 tellraw 指令格式错误
+4. 上下文长度超过限制会自动清理早期记录
+
+## 作者说明
+自学 Python 一天完成的简易项目，代码存在不规范之处与潜在问题，欢迎指正。
