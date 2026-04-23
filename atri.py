@@ -14,7 +14,7 @@ sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def sock_start():
     sc.connect(('localhost',25575))
-    passwd = "REoxygen".encode('utf-8')
+    passwd = PASSWD.encode('utf-8')
     len_pack = (len(passwd) + 11).to_bytes(4,byteorder="little",signed=True)
     sc.send(len_pack + b"\x01\x00\x00\x00" + b"\x03\x00\x00\x00" + passwd + b"\x00\x00\x00")
     sc.recv(1024)
