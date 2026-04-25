@@ -5,7 +5,7 @@ import time
 import socket
 from openai import OpenAI
 
-LATEST_LOG_PATH = ".logs/latest.log" # 你的服务器日志路径
+LATEST_LOG_PATH = "./logs/latest.log" # 你的服务器日志路径
 API_KEY = "" # 你的 API 密钥
 PASSWD = "" # 你的 RCON 密码
 BASE_URL = "https://api.deepseek.com" # 根据实际情况替换，如果换成 deepseek 以外的模型，手动修改 48 行
@@ -20,7 +20,22 @@ def socket_login():
     len_pack = (len(passwd) + 11).to_bytes(4,byteorder="little",signed=True)
     sc.send(len_pack + b"\x01\x00\x00\x00" + b"\x03\x00\x00\x00" + passwd + b"\x00\x00\x00")
     res = sc.recv(1024)
-        
+def heartbeat():
+    try:
+        socket_login()
+    except:
+        print(">>> 连接断开，尝试重新建立连接...")
+        while True:
+            try:
+                global sc
+                sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sc.connect(('localhost',25575))
+                socket_login()
+                print(">>> 重新建立连接！")
+                break
+            except Exception:
+                time.sleep(2)
+                pass
 # 发送指令数据包的方法
 def socket_send(command):
     command = command.encode('utf-8')
@@ -50,12 +65,17 @@ def main():
 
     while True:
 
+        heartbeat()
+
         # 读取最后一行
         with open(LATEST_LOG_PATH,'r') as file:
             last_line = None
             for line in file:
                 last_line = line.strip()
-            key = last_line[-3:]
+            try:
+                key = last_line[-3:]
+            except:
+                pass
 
         if key == ">>>":
 
@@ -113,30 +133,3 @@ socket_login()
 print(">>> 登录数据包已发送")
 
 main()
-
-
-
-# ===================================================#
-#          bug 满天飞，欢迎各位大佬随时批评指正!          
-#
-#                       _oo0oo_
-#                      o8888888o
-#                      88" . "88
-#                      (| -_- |)
-#                      0\  =  /0
-#                    ___/`---'\___
-#                  .' \\|     |// '.
-#                 / \\|||  :  |||// \
-#                / _||||| -:- |||||- \
-#               |   | \\\  -  /// |   |
-#               | \_|  ''\---/''  |_/ |
-#               \  .-\__  '-'  ___/-. /
-#             ___'. .'  /--.--\  `. .'___
-#          ."" '<  `.___\_<|>_/___.'_> '".
-#         | | :  `- \`. ;`. _/ ; .-' / : | |
-#         \  \ `-.   \_ __\ /__ _/   .-' /  /
-#  ======`-.____`-.___\_____/___.-`____.-'==========
-#                       `=---='
-#
-#          佛祖保佑        无bug、不报错
-# ===================================================
